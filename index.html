@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Daily Pixel</title>
+<meta name="description" content="The newspaper of the Pixel Universe. A new edition every day at 00:00 UTC: racing, the Senate, the city, the weather and the turf.">
+<meta name="theme-color" content="#E6ECEE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#10181D" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 9 9%22 shape-rendering=%22crispEdges%22%3E%3Cpath fill=%22%23F3F6F7%22 d=%22M1 0h7v9H1z%22/%3E%3Cpath fill=%22%2314212A%22 d=%22M2 1h5v1H2zM2 3h2v2H2zM5 3h2v1H5zM5 5h2v1H5zM2 7h5v1H2z%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="paper">
+  <header class="masthead">
+    <h1 id="wordmark" aria-label="The Daily Pixel"></h1>
+    <p class="motto">Reporting on everything, slowly</p>
+    <div class="dateline">
+      <span id="ed-no"></span>
+      <span id="ed-date"></span>
+      <span>Price 1 W</span>
+    </div>
+    <nav class="editions" aria-label="Editions">
+      <a id="prev" href="#">Previous edition</a>
+      <a id="today" href="#">Today’s edition</a>
+      <label class="archive">Read the edition for <input type="date" id="pickdate"></label>
+      <a id="next" href="#">Next edition</a>
+    </nav>
+  </header>
+
+  <p class="notice" id="notice" hidden></p>
+  <main id="edition" aria-live="polite"><p class="loading">Setting the type…</p></main>
+
+  <footer class="foot">
+    <p>A new edition is published every day at 00:00 UTC and covers the 24 hours before it. Times are shown in UTC, as the universe keeps them.</p>
+    <p>Part of the <a href="https://github.com/DVExperiments">Pixel Universe</a>. Also see <a href="https://dvexperiments.github.io/Glacial/">Glacial</a>, the <a href="https://dvexperiments.github.io/Weather/">Weather Bureau</a>, the <a href="https://dvexperiments.github.io/Senate/">Senate</a>, <a href="https://dvexperiments.github.io/City/">Pixel City</a> and the <a href="https://dvexperiments.github.io/Bookmaker/">Bookmaker</a>.</p>
+  </footer>
+</div>
+
+<!-- upstream, in dependency order. Glacial and the Weather Bureau are required; the rest are optional desks. -->
+<script>window.PixelUniverseOptions = Object.assign(window.PixelUniverseOptions || {}, { senateSkipGlacial: true });</script>
+<script src="https://dvexperiments.github.io/Glacial/js/pixels.js"></script>
+<script src="https://dvexperiments.github.io/Glacial/js/sim.js"></script>
+<script src="https://dvexperiments.github.io/Glacial/js/league.js"></script>
+<script src="https://dvexperiments.github.io/Weather/universe.js"></script>
+<script src="https://dvexperiments.github.io/Senate/universe.js"></script>
+<script src="https://dvexperiments.github.io/City/universe.js"></script>
+<script src="https://dvexperiments.github.io/Bookmaker/universe.js"></script>
+<script src="universe.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
