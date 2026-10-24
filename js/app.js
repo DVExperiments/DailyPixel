@@ -116,7 +116,7 @@
     return h + '</div>';
   }
 
-  const DESK = { senate: 'Senate', city: 'City', bookmaker: 'Bookmaker', weather: 'Weather Bureau', commerce: 'Exchange', freight: 'Freight', society: 'Society' };
+  const DESK = { senate: 'Senate', city: 'City', bookmaker: 'Bookmaker', weather: 'Weather Bureau', commerce: 'Exchange', freight: 'Freight', society: 'Society', bank: 'Bank' };
   function render(d) {
     const ed = P.editionAt(d);
     applyLaws(d + DAY / 2);

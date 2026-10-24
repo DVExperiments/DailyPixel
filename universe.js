@@ -66,7 +66,8 @@
     bookmaker: () => ok(U().bookmaker) && U().bookmaker,
     commerce: () => ok(U().commerce) && U().commerce,
     freight: () => ok(U().commerce) && U().freight,
-    society: () => ok(U().society) && U().society
+    society: () => ok(U().society) && U().society,
+    bank: () => ok(U().commerce) && U().bank
   };
   const ready = () => { const g = G(); return !!(g && g.buildLeague && g.PIXELS && desk.weather()); };
   const PX = (id) => G().PX[id];
@@ -261,10 +262,16 @@
     'freight.shelves': (e) => ({ headline: 'Empty shelves', body: [e.headline + '.', 'Shops can only sell what the rounds bring.'] }),
     // the society pages
     'fad.everywhere': (e) => ({ headline: e.data.category === 'song' ? 'The song of the moment' : e.data.category === 'colour' ? e.data.item + ', everywhere' : 'The craze of the moment', body: [e.headline + '.'] }),
+    'bank.opened': (e) => ({ headline: 'The Bank of Pixel City opens', body: [e.headline + '.', 'Its first act was to take over every business\u2019s overdraft.'] }),
+    'bank.rate': (e) => ({ headline: 'Bank rate ' + (e.data.rate > e.data.was ? 'up' : 'down') + ' to ' + e.data.rate + '%', body: [e.headline + '.', 'Prices in the shops have risen at a yearly pace of ' + e.data.inflation + '% over the last three months.'] }),
+    'bank.default': (e) => ({ headline: 'A large bad debt', body: [e.headline + '.'] }),
+    'bank.squeeze': (e) => ({ headline: 'The Bank tightens', body: [e.headline + '.', 'Its capital stands at ' + e.data.capitalRatio + '% of its lending.'] }),
+    'bank.capital': (e) => ({ headline: 'The Bank stops lending', body: [e.headline + '.'] }),
+    'bank.arrears': (e) => ({ headline: 'Home loans in arrears', body: [e.headline + '.'] }),
     'society.turns': (e) => ({ headline: e.data.community + ' change sides', body: [e.headline + '.'] })
   };
-  const SECTION = { glacial: 'Racing', weather: 'Weather', senate: 'The Senate', city: 'City', bookmaker: 'The Turf', commerce: 'Business', freight: 'Business', society: 'Society' };
-  const SOURCE_RANK = { glacial: 0, senate: 1, weather: 2, city: 3, commerce: 4, freight: 5, society: 6, bookmaker: 7 };
+  const SECTION = { glacial: 'Racing', weather: 'Weather', senate: 'The Senate', city: 'City', bookmaker: 'The Turf', commerce: 'Business', freight: 'Business', bank: 'Business', society: 'Society' };
+  const SOURCE_RANK = { glacial: 0, senate: 1, weather: 2, city: 3, commerce: 4, bank: 4, freight: 5, society: 6, bookmaker: 7 };
 
   // ---------------------------------------------------------------- the edition
   const cache = new Map();
@@ -284,7 +291,7 @@
       catch (err) { missing.push(key); }
     }
     // the Exchange and Society post their results at the close, in the first minute after 00:00 UTC: this edition
-    for (const key of ['commerce', 'freight', 'society']) {
+    for (const key of ['commerce', 'freight', 'bank', 'society']) {
       const s = desk[key]();
       if (!s) { missing.push(key); continue; }
       try { for (const e of s.eventsBetween(from + MIN, to + MIN)) events.push(Object.assign({ ms: Date.parse(e.time) }, e)); }
@@ -298,7 +305,7 @@
     const agg = { coal: [0, 0], gas: [0, 0], intro: [], results: 0, held: [], closed: [], opened: [], fads: [], mended: 0 };
     for (const e of events) {
       const w = WRITERS[e.type];
-      if (w && (e.importance >= 2 || e.type === 'race.finish') && !(e.type === 'business.closed' && e.importance < 3)) { // small closures go in the briefs
+      if (w && (e.importance >= 2 || e.type === 'race.finish') && !((e.type === 'business.closed' || e.type === 'bank.default') && e.importance < 3)) { // small closures go in the briefs
         const s = w(e, ctx);
         stories.push(Object.assign({ id: e.id, section: SECTION[e.source] || 'News', source: e.source, importance: e.importance, time: e.time, ms: e.ms }, s));
         continue;
