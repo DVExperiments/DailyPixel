@@ -63,7 +63,10 @@
     weather: () => ok(U().climate) && U().climate,
     senate: () => ok(U().senate) && U().senate,
     city: () => ok(U().city) && U().city,
-    bookmaker: () => ok(U().bookmaker) && U().bookmaker
+    bookmaker: () => ok(U().bookmaker) && U().bookmaker,
+    commerce: () => ok(U().commerce) && U().commerce,
+    freight: () => ok(U().commerce) && U().freight,
+    society: () => ok(U().society) && U().society
   };
   const ready = () => { const g = G(); return !!(g && g.buildLeague && g.PIXELS && desk.weather()); };
   const PX = (id) => G().PX[id];
@@ -246,10 +249,22 @@
     'senator.scandal': (e) => ({ headline: 'Senator apologises', body: [e.headline + '.'] }),
     'record.payout': (e) => ({ headline: 'Record payout at the Bookmaker', body: [e.headline + '.'] }),
     'record.longshot': (e) => ({ headline: 'Longshot lands', body: [e.headline + '.'] }),
-    'resident.ruined': (e) => ({ headline: 'A regular is cleaned out', body: [e.headline + '.', 'The stipend arrives on the 1st.'] })
+    'resident.ruined': (e) => ({ headline: 'A regular is cleaned out', body: [e.headline + '.', 'The stipend arrives on the 1st.'] }),
+    // the business desk: the Exchange and the docks
+    'business.closed': (e) => ({ headline: e.data.name + ' closes', body: [e.headline + '.', 'The business ' + (e.data.reason === 'ran out of credit' ? 'ran out of credit' : 'gave up after months of losses') + '. Its staff will be looking for work at the Job Centre.'] }),
+    'market.boom': (e) => ({ headline: 'Sprite orders jump', body: [e.headline + '.', 'The Exchange expects the palette refineries and texture foundries to feel it within weeks.'] }),
+    'market.slump': (e) => ({ headline: 'Sprite orders fall', body: [e.headline + '.', 'The Exchange expects the palette refineries and texture foundries to feel it within weeks.'] }),
+    'market.shortage': (e) => ({ headline: 'Short of ' + e.data.market.toLowerCase(), body: [e.headline + '.'] }),
+    'market.report': (e) => ({ headline: 'The month on the Exchange', body: [e.headline + '.', 'The shopping basket stands at ' + e.data.cpi.toFixed(1) + ', against 100 on the first day of trading.'] }),
+    'freight.rawlow': (e) => ({ headline: 'Raw colour runs low', body: [e.headline + '.'] }),
+    'freight.dockfull': (e) => ({ headline: 'The export dock is full', body: [e.headline + '.'] }),
+    'freight.shelves': (e) => ({ headline: 'Empty shelves', body: [e.headline + '.', 'Shops can only sell what the rounds bring.'] }),
+    // the society pages
+    'fad.everywhere': (e) => ({ headline: e.data.category === 'song' ? 'The song of the moment' : e.data.category === 'colour' ? e.data.item + ', everywhere' : 'The craze of the moment', body: [e.headline + '.'] }),
+    'society.turns': (e) => ({ headline: e.data.community + ' change sides', body: [e.headline + '.'] })
   };
-  const SECTION = { glacial: 'Racing', weather: 'Weather', senate: 'The Senate', city: 'City', bookmaker: 'The Turf' };
-  const SOURCE_RANK = { glacial: 0, senate: 1, weather: 2, city: 3, bookmaker: 4 };
+  const SECTION = { glacial: 'Racing', weather: 'Weather', senate: 'The Senate', city: 'City', bookmaker: 'The Turf', commerce: 'Business', freight: 'Business', society: 'Society' };
+  const SOURCE_RANK = { glacial: 0, senate: 1, weather: 2, city: 3, commerce: 4, freight: 5, society: 6, bookmaker: 7 };
 
   // ---------------------------------------------------------------- the edition
   const cache = new Map();
@@ -268,15 +283,22 @@
       try { for (const e of s.eventsBetween(from, to)) events.push(Object.assign({ ms: Date.parse(e.time) }, e, { source: key === 'weather' ? 'weather' : e.source })); }
       catch (err) { missing.push(key); }
     }
+    // the Exchange and Society post their results at the close, in the first minute after 00:00 UTC: this edition
+    for (const key of ['commerce', 'freight', 'society']) {
+      const s = desk[key]();
+      if (!s) { missing.push(key); continue; }
+      try { for (const e of s.eventsBetween(from + MIN, to + MIN)) events.push(Object.assign({ ms: Date.parse(e.time) }, e)); }
+      catch (err) { missing.push(key); }
+    }
     const ctx = { day: d };
 
     // stories and briefs
     const stories = [], briefs = {};
     const brief = (sec, text) => (briefs[sec] = briefs[sec] || []).push(text);
-    const agg = { coal: [0, 0], gas: [0, 0], intro: [], results: 0, held: [] };
+    const agg = { coal: [0, 0], gas: [0, 0], intro: [], results: 0, held: [], closed: [], opened: [], fads: [], mended: 0 };
     for (const e of events) {
       const w = WRITERS[e.type];
-      if (w && (e.importance >= 2 || e.type === 'race.finish')) {
+      if (w && (e.importance >= 2 || e.type === 'race.finish') && !(e.type === 'business.closed' && e.importance < 3)) { // small closures go in the briefs
         const s = w(e, ctx);
         stories.push(Object.assign({ id: e.id, section: SECTION[e.source] || 'News', source: e.source, importance: e.importance, time: e.time, ms: e.ms }, s));
         continue;
@@ -288,12 +310,20 @@
       if (e.type === 'election.result') { agg.results++; continue; }
       if (e.type === 'bet.large' || e.type === 'market.open' || e.type === 'market.settled') continue; // in the Turf column
       if (e.type === 'forecaster.week') continue;
+      if (e.type === 'business.closed') { agg.closed.push(e.data.name + ' (' + e.data.district + ')'); continue; }
+      if (e.type === 'business.opened') { agg.opened.push(e.data.name + ' (' + e.data.district + ')'); continue; }
+      if (e.type === 'fad.start') { agg.fads.push(e.headline); continue; }
+      if (e.type === 'society.reconciled') { agg.mended++; continue; }
       brief(SECTION[e.source] || 'News', e.headline + '.');
     }
     if (agg.coal[0]) brief('City', cap(count(agg.coal[0], 'coal carrier')) + ' docked, bringing ' + num(agg.coal[1]) + ' t of coal for the power plants.');
     if (agg.gas[0]) brief('City', cap(count(agg.gas[0], 'gas tanker')) + ' docked with ' + num(agg.gas[1]) + ' t of gas for the peakers.');
     if (agg.held.length) brief('City', (agg.held.length === 1 ? 'The ' + agg.held[0] + ' was' : list(agg.held) + ' were') + ' held outside the harbour by the weather.');
     if (agg.intro.length) brief('The Senate', 'Introduced: ' + list(agg.intro) + '.');
+    if (agg.closed.length) brief('Business', 'Closed: ' + list(agg.closed) + '.');
+    if (agg.opened.length) brief('Business', 'Opened: ' + list(agg.opened) + '.');
+    for (const f of agg.fads.slice(0, 3)) brief('Society', f + '.');
+    if (agg.mended) brief('Society', cap(count(agg.mended, 'old quarrel')) + ' patched up.');
     if (agg.results) brief('The Senate', 'Results were declared in ' + count(agg.results, 'seat') + '. Full returns on page two, which does not exist.');
 
     stories.sort((a, b) => b.importance - a.importance || SOURCE_RANK[a.source] - SOURCE_RANK[b.source] || a.ms - b.ms);

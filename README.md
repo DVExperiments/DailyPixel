@@ -43,3 +43,7 @@ universe.js     builds editions, no DOM
 js/app.js       the printing press
 css/style.css   Glacial's variables, so Senate laws restyle the paper
 ```
+
+## Business and Society desks
+
+The paper also files from the Pixel Exchange (`commerce`), its docks (`freight`) and Pixel City Society (`society`), in two sections, Business and Society. Big closures (25 jobs or more), booms and slumps in sprite orders, shortages, the Exchange's monthly report, raw colour running low, a full export dock, empty shelves, crazes that are everywhere and communities changing sides get stories; smaller closures, openings, new crazes and quarrels patched up go in the briefs. These desks post at the close of trading, in the first minute after 00:00 UTC, so the paper reads them a minute later and they make that day's edition. Like the other desks, they are optional: if one doesn't load, the paper still prints and says which desk did not file.
