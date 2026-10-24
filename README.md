@@ -51,3 +51,5 @@ The paper also files from the Pixel Exchange (`commerce`), its docks (`freight`)
 The Bank of Pixel City's desk (`bank`) files in Business: rate changes, its opening, large bad debts, tightened lending, capital trouble and arrears get stories; smaller bad debts go in the briefs.
 
 Glitches (City's digital disasters) get stories when they start and when they spread; the all-clear goes in the City briefs. Society's monthly migration report, districts losing a tenth of their pixels and districts too full for new arrivals get stories too.
+
+The University desk (from Pixel University, through the Census Office's working lives) files when the University opens, when each year begins on 1 March, and on graduation day each 1 December.

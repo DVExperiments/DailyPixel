@@ -67,7 +67,8 @@
     commerce: () => ok(U().commerce) && U().commerce,
     freight: () => ok(U().commerce) && U().freight,
     society: () => ok(U().society) && U().society,
-    bank: () => ok(U().commerce) && U().bank
+    bank: () => ok(U().commerce) && U().bank,
+    university: () => (ok(U().labour) && U().labour.universityEventsBetween ? { eventsBetween: (f, t) => U().labour.universityEventsBetween(f, t) } : null)
   };
   const ready = () => { const g = G(); return !!(g && g.buildLeague && g.PIXELS && desk.weather()); };
   const PX = (id) => G().PX[id];
@@ -276,10 +277,13 @@
     'society.migration': (e) => ({ headline: 'Comings and goings', body: [e.headline + '.'] }),
     'society.exodus': (e) => ({ headline: 'Pixels leave ' + e.data.district, body: [e.headline + '.', 'Senators who hold seats there face the voters with fewer of them.'] }),
     'society.full': (e) => ({ headline: e.data.district + ' is full', body: [e.headline + '.'] }),
+    'university.opens': (e) => ({ headline: 'Pixel University opens', body: [e.headline + '.', 'Seven faculties, from Rendering to the Philosophy of the Refresh, began teaching at 8:30am.'] }),
+    'university.term': (e) => ({ headline: 'A new year at the University', body: [e.headline + '.'] }),
+    'university.graduation': (e) => ({ headline: 'Graduation day', body: [e.headline + '.', 'Graduates move up: the Job Centre reports senior roles and better pay for them.'] }),
     'society.turns': (e) => ({ headline: e.data.community + ' change sides', body: [e.headline + '.'] })
   };
-  const SECTION = { glacial: 'Racing', weather: 'Weather', senate: 'The Senate', city: 'City', bookmaker: 'The Turf', commerce: 'Business', freight: 'Business', bank: 'Business', society: 'Society' };
-  const SOURCE_RANK = { glacial: 0, senate: 1, weather: 2, city: 3, commerce: 4, bank: 4, freight: 5, society: 6, bookmaker: 7 };
+  const SECTION = { glacial: 'Racing', weather: 'Weather', senate: 'The Senate', city: 'City', bookmaker: 'The Turf', commerce: 'Business', freight: 'Business', bank: 'Business', society: 'Society', university: 'University' };
+  const SOURCE_RANK = { glacial: 0, senate: 1, weather: 2, city: 3, commerce: 4, bank: 4, freight: 5, society: 6, university: 6, bookmaker: 7 };
 
   // ---------------------------------------------------------------- the edition
   const cache = new Map();
@@ -299,7 +303,7 @@
       catch (err) { missing.push(key); }
     }
     // the Exchange and Society post their results at the close, in the first minute after 00:00 UTC: this edition
-    for (const key of ['commerce', 'freight', 'bank', 'society']) {
+    for (const key of ['commerce', 'freight', 'bank', 'society', 'university']) {
       const s = desk[key]();
       if (!s) { missing.push(key); continue; }
       try { for (const e of s.eventsBetween(from + MIN, to + MIN)) events.push(Object.assign({ ms: Date.parse(e.time) }, e)); }
