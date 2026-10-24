@@ -268,6 +268,14 @@
     'bank.squeeze': (e) => ({ headline: 'The Bank tightens', body: [e.headline + '.', 'Its capital stands at ' + e.data.capitalRatio + '% of its lending.'] }),
     'bank.capital': (e) => ({ headline: 'The Bank stops lending', body: [e.headline + '.'] }),
     'bank.arrears': (e) => ({ headline: 'Home loans in arrears', body: [e.headline + '.'] }),
+    // disasters
+    'glitch.start': (e) => ({ headline: { corruption: 'Textures corrupt in ' + e.data.district, refresh: e.data.district + ' loses its signal', bleed: 'Palette bleed in ' + e.data.district, stuck: e.data.district + ' freezes', leak: 'Leak at the export dock' }[e.data.type] || e.data.label,
+      body: [e.headline + '.', 'The city expects it to last about ' + e.data.hours + ' hours. ' + (e.data.type === 'refresh' ? 'The district is dark until then.' : e.data.type === 'stuck' ? 'Deliveries cannot get in.' : e.data.type === 'leak' ? 'The refineries will feel it.' : 'The patch shops are already busy.')] }),
+    'glitch.spread': (e) => ({ headline: 'Glitch spreads to ' + e.data.district, body: [e.headline + '.', 'It is the ' + e.data.label.toLowerCase() + ' that began elsewhere, and it has not finished.'] }),
+    // the city's comings and goings
+    'society.migration': (e) => ({ headline: 'Comings and goings', body: [e.headline + '.'] }),
+    'society.exodus': (e) => ({ headline: 'Pixels leave ' + e.data.district, body: [e.headline + '.', 'Senators who hold seats there face the voters with fewer of them.'] }),
+    'society.full': (e) => ({ headline: e.data.district + ' is full', body: [e.headline + '.'] }),
     'society.turns': (e) => ({ headline: e.data.community + ' change sides', body: [e.headline + '.'] })
   };
   const SECTION = { glacial: 'Racing', weather: 'Weather', senate: 'The Senate', city: 'City', bookmaker: 'The Turf', commerce: 'Business', freight: 'Business', bank: 'Business', society: 'Society' };
