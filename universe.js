@@ -319,6 +319,9 @@
       const w = WRITERS[e.type];
       if (w && (e.importance >= 2 || e.type === 'race.finish') && !((e.type === 'business.closed' || e.type === 'bank.default') && e.importance < 3)) { // small closures go in the briefs
         const s = w(e, ctx);
+        // where the event knows its causes, the story says so
+        const cz = e.data && e.data.causes;
+        if (cz && cz.length && s.body) s.body = s.body.concat([cz.length === 1 && cz[0].share === 100 ? cap(cz[0].label) + ', by all accounts.' : 'The books show why: ' + list(cz.map((c) => c.label + ' (' + c.share + '%)')) + '.']);
         stories.push(Object.assign({ id: e.id, section: SECTION[e.source] || 'News', source: e.source, importance: e.importance, time: e.time, ms: e.ms }, s));
         continue;
       }
@@ -329,7 +332,7 @@
       if (e.type === 'election.result') { agg.results++; continue; }
       if (e.type === 'bet.large' || e.type === 'market.open' || e.type === 'market.settled') continue; // in the Turf column
       if (e.type === 'forecaster.week') continue;
-      if (e.type === 'business.closed') { agg.closed.push(e.data.name + ' (' + e.data.district + ')'); continue; }
+      if (e.type === 'business.closed') { agg.closed.push(e.data.name + ' (' + e.data.district + (e.data.causes && e.data.causes[0] ? ', ' + e.data.causes[0].label : '') + ')'); continue; }
       if (e.type === 'business.opened') { agg.opened.push(e.data.name + ' (' + e.data.district + ')'); continue; }
       if (e.type === 'fad.start') { agg.fads.push(e.headline); continue; }
       if (e.type === 'society.reconciled') { agg.mended++; continue; }

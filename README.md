@@ -53,3 +53,5 @@ The Bank of Pixel City's desk (`bank`) files in Business: rate changes, its open
 Glitches (City's digital disasters) get stories when they start and when they spread; the all-clear goes in the City briefs. Society's monthly migration report, districts losing a tenth of their pixels and districts too full for new arrivals get stories too.
 
 The University desk (from Pixel University, through the Census Office's working lives) files when the University opens, when each year begins on 1 March, and on graduation day each 1 December.
+
+Where an event carries its causes (`data.causes`: the Exchange's closures, shortages and bad debts, Society's migration and changes of allegiance), the story ends with them ("The books show why: power got expensive (52%) and customers stopped buying (31%)."), and closures in the briefs give their main cause.
